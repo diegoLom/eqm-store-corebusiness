@@ -1,0 +1,29 @@
+config:
+  datasource:
+    url: jdbc:mysql://localhost:3308/inventory_db
+    username: "root"
+    password: "123456"
+    driverClassName: "com.mysql.jdbc.Driver"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+
+spring:
+  application:
+    name: inventory-management
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+
+
+
