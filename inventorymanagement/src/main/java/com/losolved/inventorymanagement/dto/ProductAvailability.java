@@ -1,4 +1,4 @@
 package com.losolved.inventorymanagement.dto;
 
-public class ProductAvailability {
+public record ProductAvailability(Integer quantityAvailable) {
 }

@@ -1,41 +1,44 @@
 package com.losolved.inventorymanagement.controller;
 
-import com.losolved.inventorymanagement.model.Inventory;
-import com.losolved.inventorymanagement.service.InventoryService;
+
+
+import com.losolved.inventorymanagement.dto.ProductComposition;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/inventories")
+@RequestMapping("/api/inventory")
 public class InventoryController {
-    private final InventoryService inventoryService;
 
-    public InventoryController(InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
+    @PostMapping("/products/{productId}/composition")
+    public void setProductComposition(@PathVariable String productId,
+                                      @RequestBody List<ProductComponentMapping> mappings) {
+        // Define how inventory items compose a product
     }
 
-    @GetMapping
-    public List<Inventory> getAllInventories() {
-        return inventoryService.getAllInventories();
+    @GetMapping("/products/{productId}/composition")
+    public ResponseEntity<ProductComposition> getProductComposition(@PathVariable String productId) {
+        // Return complete product composition with pricing
+
+        return null;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Inventory> getInventoryById(@PathVariable Long id) {
-        return inventoryService.getInventoryById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/products/{productId}/availability")
+    public ResponseEntity<ProductAvailability> checkAvailability(@PathVariable String productId,
+                                                 @RequestParam Integer quantity) {
+        // Check if enough inventory exists for all components
     }
 
-    @PostMapping
-    public Inventory createInventory(@RequestBody Inventory inventory) {
-        return inventoryService.saveInventory(inventory);
-    }
+    /**
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInventory(@PathVariable Long id) {
-        inventoryService.deleteInventory(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/products/{productId}/reserve")
+    public ReservationResult reserveInventory(@PathVariable String productId,
+                                              @RequestParam Integer quantity) {
+        // Reserve inventory for order
     }
+**/
+
+
 }

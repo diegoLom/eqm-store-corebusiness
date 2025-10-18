@@ -1,4 +1,4 @@
-package com.losolved.product.service.dto;
+package com.losolved.product.dto;
 
 import java.math.BigDecimal;
 
