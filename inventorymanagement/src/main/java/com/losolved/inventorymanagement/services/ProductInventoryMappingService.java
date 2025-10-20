@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -45,25 +46,56 @@ public class ProductInventoryMappingService {
     public void deleteMapping(Long id) {
         mappingRepository.deleteById(id);
     }
-//TODO: 
 
-    public ProductAvailability checkAvailability(Long productId) {
+
+
+    //TODO: Remove below methods to a dedicated ProductAvailabilityService
+        public boolean checkAvailability(Long productId) {
         List<ProductInventoryMapping> mappings = findByProductId(productId);
 
+        long itemsRequiredQuantity = mappings.stream().filter(x -> x.isRequired()).count();
+        long itemRequiredWithEnoughResources = mappings.stream().filter(x -> hasSufficientQuantityFromMapping().test(x)).count();
 
+        boolean isAvailable = itemRequiredWithEnoughResources >= itemsRequiredQuantity;
 
-        mappings.stream().filter(x -> hasSufficientQuantityFromMapping().test(x)).count();
-
-
-
-        int totalQuantity = mappings.stream()
-                .mapToInt(ProductInventoryMapping::getQuantity)
-                .sum();
-        boolean isAvailable = totalQuantity > 0;
-        return new ProductAvailability(productId, isAvailable, totalQuantity);
+        return isAvailable;
     }
 
+    public ProductAvailability getProductAvailability(Long productId) {
 
+
+        boolean isAvailable = checkAvailability(productId);
+
+
+    Integer availableUnits = calculateAvailableUnits(productId);
+
+        return new
+
+    ProductAvailability(isAvailable, availableUnits);
+}
+
+    public Integer calculateAvailableUnits(Long productId) {
+        List<ProductInventoryMapping> mappings = findByProductId(productId);
+
+        return mappings.stream()
+                .map(getAvailableUnitsFunction())
+                .filter(u -> u != Integer.MAX_VALUE) // ignore non-constraining components
+                .min(Integer::compareTo)
+                .orElse(0);
+    }
+
+    public static Function<ProductInventoryMapping, Integer> getAvailableUnitsFunction() {
+        return m -> {
+            if (m == null || !m.isRequired()) return Integer.MAX_VALUE;
+
+            Integer stockQty = m.getInventoryItem() != null ? m.getInventoryItem().getStockQuantity() : 0;
+            Integer qtyRequired = m.getQuantityRequired() != null ? m.getQuantityRequired() : 0;
+
+            if (qtyRequired <= 0) return Integer.MAX_VALUE;
+
+            return stockQty / qtyRequired;
+        };
+    }
 
 
 
