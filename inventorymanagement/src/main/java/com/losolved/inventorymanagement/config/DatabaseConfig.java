@@ -20,6 +20,8 @@ public class DatabaseConfig {
         this.dataSourceProperties = dataSourceProperties;
     }
 
+    //TODO: Use spring boot cloud config
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
