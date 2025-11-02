@@ -1,4 +1,4 @@
-package com.losolved.inventorymanagement.controllers;
+package com.losolved.inventorymanagement.controller;
 
 import com.losolved.inventorymanagement.model.ProductInventoryMapping;
 import com.losolved.inventorymanagement.services.ProductInventoryMappingService;
@@ -23,7 +23,7 @@ public class ProductInventoryMappingController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductInventoryMapping> getById(@PathVariable Long id) {
-        return mappingService.getById(id)
+        return mappingService.getMappingById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -32,6 +32,13 @@ public class ProductInventoryMappingController {
     public ResponseEntity<ProductInventoryMapping> create(@RequestBody ProductInventoryMapping mapping) {
         ProductInventoryMapping saved = mappingService.saveMapping(mapping);
         return ResponseEntity.ok(saved);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductInventoryMapping> update(@PathVariable Integer id, @RequestBody ProductInventoryMapping mapping) {
+        return mappingService.updateMapping(id, mapping)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

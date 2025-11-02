@@ -29,16 +29,23 @@ public class ProductInventoryMappingService {
         return mappingRepository.findById(id);
     }
 
-    public List<ProductInventoryMapping> findByProductId(Long productId) {
+    public List<ProductInventoryMapping> findByProductId(Integer productId) {
         return mappingRepository.findByProductId(productId);
     }
 
     public Optional<ProductInventoryMapping> findByInventoryItemId(Long inventoryItemId) {
-        return mappingRepository.findByInventoryItemId(inventoryItemId);
+        return mappingRepository.findByInventoryItemItemId(inventoryItemId);
     }
 
     public ProductInventoryMapping saveMapping(ProductInventoryMapping mapping) {
         return mappingRepository.save(mapping);
+    }
+
+    public Optional<ProductInventoryMapping> updateMapping(Integer id, ProductInventoryMapping mapping) {
+        mapping.setMappingId(id);
+
+        return mappingRepository.findById(Long.valueOf(id))
+                .map(existing -> mappingRepository.save(mapping));
     }
 
     public void deleteMapping(Long id) {

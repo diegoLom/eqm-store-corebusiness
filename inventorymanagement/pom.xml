@@ -18,9 +18,19 @@
     <properties>
         <java.version>21</java.version>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <instancio.version>2.12.0</instancio.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-core</artifactId>
+            <version>${instancio.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

@@ -16,7 +16,7 @@ public class ProductAvailabilityService {
         this.mappingService = mappingService;
     }
 
-    public boolean checkAvailability(Long productId) {
+    public boolean checkAvailability(Integer productId) {
         List<ProductInventoryMapping> mappings = mappingService.findByProductId(productId);
 
         long itemsRequiredQuantity = mappings.stream().filter(ProductInventoryMapping::isRequired).count();
@@ -27,13 +27,13 @@ public class ProductAvailabilityService {
         return itemRequiredWithEnoughResources >= itemsRequiredQuantity;
     }
 
-    public ProductAvailability getProductAvailability(Long productId) {
+    public ProductAvailability getProductAvailability(Integer productId) {
         boolean isAvailable = checkAvailability(productId);
         Integer availableUnits = calculateAvailableUnits(productId);
-        return new ProductAvailability(isAvailable, availableUnits);
+        return new ProductAvailability(isAvailable, availableUnits, productId);
     }
 
-    public Integer calculateAvailableUnits(Long productId) {
+    public Integer calculateAvailableUnits(Integer productId) {
         List<ProductInventoryMapping> mappings = mappingService.findByProductId(productId);
 
         return mappings.stream()

@@ -1,4 +1,4 @@
 package com.losolved.inventorymanagement.dto;
 
-public record ProductAvailability(Boolean isAvailable, Integer quantityAvailable) {
+public record ProductAvailability(Boolean isAvailable, Integer quantityAvailable, Integer productId) {
 }

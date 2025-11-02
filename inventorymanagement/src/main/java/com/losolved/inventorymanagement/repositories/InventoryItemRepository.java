@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface InventoryItemRepository extends CrudRepository<InventoryItem, Long> {
+public interface InventoryItemRepository extends CrudRepository<InventoryItem, Integer> {
 
     Optional<InventoryItem> findBySku(String sku);
     List<InventoryItem> findByNameContainingIgnoreCase(String name);

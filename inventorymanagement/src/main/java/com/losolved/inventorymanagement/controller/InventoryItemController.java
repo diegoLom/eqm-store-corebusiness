@@ -1,4 +1,4 @@
-package com.losolved.inventorymanagement.controllers;
+package com.losolved.inventorymanagement.controller;
 
 import com.losolved.inventorymanagement.model.InventoryItem;
 import com.losolved.inventorymanagement.services.InventoryItemService;
@@ -22,7 +22,7 @@ public class InventoryItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InventoryItem> getById(@PathVariable Long id) {
+    public ResponseEntity<InventoryItem> getById(@PathVariable Integer id) {
         return inventoryItemService.getItemById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -47,13 +47,13 @@ public class InventoryItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         inventoryItemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<InventoryItem> update(@PathVariable Long id, @RequestBody InventoryItem item) {
+    public ResponseEntity<InventoryItem> update(@PathVariable Integer id, @RequestBody InventoryItem item) {
         if (item == null) {
             return ResponseEntity.badRequest().build();
         }

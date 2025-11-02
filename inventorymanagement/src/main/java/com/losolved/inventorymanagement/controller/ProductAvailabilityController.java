@@ -1,5 +1,6 @@
-package com.losolved.inventorymanagement.controllers;
+package com.losolved.inventorymanagement.controller;
 
+import com.losolved.inventorymanagement.dto.ProductAvailability;
 import com.losolved.inventorymanagement.model.ProductInventoryMapping;
 import com.losolved.inventorymanagement.services.ProductAvailabilityService;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ public class ProductAvailabilityController {
 
 
       @GetMapping("/product/{productId}")
-    public ResponseEntity<Integer> calculateForProduct(@PathVariable Long productId) {
-        Integer available = availabilityService.calculateAvailableUnits(productId);
-        return available == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(available);
+    public ResponseEntity<ProductAvailability> calculateForProduct(@PathVariable Integer productId) {
+        ProductAvailability available = availabilityService.getProductAvailability(productId);
+        return  !available.isAvailable()? ResponseEntity.notFound().build() : ResponseEntity.ok(available);
     }
 }
