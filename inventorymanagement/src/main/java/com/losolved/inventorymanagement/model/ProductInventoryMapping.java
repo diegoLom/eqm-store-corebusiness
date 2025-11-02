@@ -1,11 +1,13 @@
 package com.losolved.inventorymanagement.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 @Entity
 @Table(name = "product_inventory_mapping")
 @Data
+@Builder
 public class ProductInventoryMapping {
     @Id
     private Integer mappingId;
@@ -24,5 +26,4 @@ public class ProductInventoryMapping {
 
     private boolean required; // Is this component mandatory?
 
-    // private Map<String, String> configuration;  Additional configuration
 }

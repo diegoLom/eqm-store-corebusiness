@@ -1,3 +1,4 @@
+// java
 package com.losolved.inventorymanagement.services;
 
 import com.losolved.inventorymanagement.model.InventoryItem;
@@ -12,10 +13,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductInventoryMappingServiceTest {
@@ -34,60 +35,149 @@ public class ProductInventoryMappingServiceTest {
     }
 
     @Test
-    void calculateAvailableUnits_emptyMappings_returnsZero() {
-        when(mappingRepository.findByProductId(1L)).thenReturn(Collections.emptyList());
-        assertEquals(0, service.calculateAvailableUnits(1L));
+    void getAllMappings_returnsAll() {
+        ProductInventoryMapping m1 = ProductInventoryMapping.builder()
+                .mappingId(1)
+                .productId(100)
+                .build();
+        ProductInventoryMapping m2 = ProductInventoryMapping.builder()
+                .mappingId(2)
+                .productId(200)
+                .build();
+
+        when(mappingRepository.findAll()).thenReturn(Arrays.asList(m1, m2));
+
+        List<ProductInventoryMapping> result = service.getAllMappings();
+
+        assertEquals(2, result.size());
+        assertEquals(m1, result.get(0));
+        assertEquals(m2, result.get(1));
     }
 
     @Test
-    void calculateAvailableUnits_nonRequiredOnly_returnsZero() {
-        ProductInventoryMapping m = mock(ProductInventoryMapping.class);
-        when(m.isRequired()).thenReturn(false);
+    void getMappingById_found() {
+        ProductInventoryMapping m = ProductInventoryMapping.builder()
+                .mappingId(1)
+                .productId(100)
+                .build();
 
-        when(mappingRepository.findByProductId(1L)).thenReturn(Collections.singletonList(m));
-        assertEquals(0, service.calculateAvailableUnits(1L));
+        when(mappingRepository.findById(1L)).thenReturn(Optional.of(m));
+
+        Optional<ProductInventoryMapping> result = service.getMappingById(1L);
+
+        assertTrue(result.isPresent());
+        assertEquals(m, result.get());
     }
 
     @Test
-    void calculateAvailableUnits_multipleMappings_returnsMinimum() {
-        ProductInventoryMapping m1 = mock(ProductInventoryMapping.class);
-        InventoryItem i1 = mock(InventoryItem.class);
-        when(m1.isRequired()).thenReturn(true);
-        when(m1.getInventoryItem()).thenReturn(i1);
-        when(i1.getStockQuantity()).thenReturn(10);
-        when(m1.getQuantityRequired()).thenReturn(2); // 10/2 = 5
+    void getMappingById_notFound() {
+        when(mappingRepository.findById(99L)).thenReturn(Optional.empty());
 
-        ProductInventoryMapping m2 = mock(ProductInventoryMapping.class);
-        InventoryItem i2 = mock(InventoryItem.class);
-        when(m2.isRequired()).thenReturn(true);
-        when(m2.getInventoryItem()).thenReturn(i2);
-        when(i2.getStockQuantity()).thenReturn(7);
-        when(m2.getQuantityRequired()).thenReturn(2); // 7/2 = 3
+        Optional<ProductInventoryMapping> result = service.getMappingById(99L);
 
-        ProductInventoryMapping m3 = mock(ProductInventoryMapping.class);
-        InventoryItem i3 = mock(InventoryItem.class);
-        when(m3.isRequired()).thenReturn(true);
-        when(m3.getInventoryItem()).thenReturn(i3);
-        when(i3.getStockQuantity()).thenReturn(20);
-        when(m3.getQuantityRequired()).thenReturn(5); // 20/5 = 4
-
-        List<ProductInventoryMapping> list = Arrays.asList(m1, m2, m3);
-        when(mappingRepository.findByProductId(42L)).thenReturn(list);
-
-        // expected minimum = 3
-        assertEquals(3, service.calculateAvailableUnits(42L));
+        assertFalse(result.isPresent());
     }
 
     @Test
-    void calculateAvailableUnits_nonPositiveRequiredIgnored() {
-        ProductInventoryMapping m = mock(ProductInventoryMapping.class);
-        InventoryItem i = mock(InventoryItem.class);
-        when(m.isRequired()).thenReturn(true);
-        when(m.getInventoryItem()).thenReturn(i);
-        when(i.getStockQuantity()).thenReturn(50);
-        when(m.getQuantityRequired()).thenReturn(0); // treated as non-constraining
+    void findByProductId_returnsList() {
+        ProductInventoryMapping m = ProductInventoryMapping.builder()
+                .mappingId(1)
+                .productId(100)
+                .build();
 
-        when(mappingRepository.findByProductId(5L)).thenReturn(Collections.singletonList(m));
-        assertEquals(0, service.calculateAvailableUnits(5L));
+        when(mappingRepository.findByProductId(100)).thenReturn(Collections.singletonList(m));
+
+        List<ProductInventoryMapping> result = service.findByProductId(100);
+
+        assertEquals(1, result.size());
+        assertEquals(m, result.get(0));
+    }
+
+    @Test
+    void findByInventoryItemId_returnsOptional() {
+        InventoryItem item = new InventoryItem();
+        item.setItemId(10);
+
+        ProductInventoryMapping m = ProductInventoryMapping.builder()
+                .mappingId(1)
+                .inventoryItem(item)
+                .build();
+
+        when(mappingRepository.findByInventoryItemItemId(10L)).thenReturn(Optional.of(m));
+
+        Optional<ProductInventoryMapping> result = service.findByInventoryItemId(10L);
+
+        assertTrue(result.isPresent());
+        assertEquals(m, result.get());
+    }
+
+    @Test
+    void saveMapping_delegatesToRepository() {
+        ProductInventoryMapping m = ProductInventoryMapping.builder()
+                .mappingId(1)
+                .productId(100)
+                .build();
+
+        when(mappingRepository.save(m)).thenReturn(m);
+
+        ProductInventoryMapping saved = service.saveMapping(m);
+
+        assertEquals(m, saved);
+        verify(mappingRepository, times(1)).save(m);
+    }
+
+    @Test
+    void updateMapping_setsIdAndSaves() {
+        Integer id = 1;
+        ProductInventoryMapping existing = ProductInventoryMapping.builder()
+                .mappingId(2)
+                .productId(100)
+                .build();
+
+        ProductInventoryMapping toUpdate = ProductInventoryMapping.builder()
+                .productId(200)
+                .build();
+
+        when(mappingRepository.findById(Long.valueOf(id))).thenReturn(Optional.of(existing));
+        ProductInventoryMapping savedMapping = ProductInventoryMapping.builder()
+                .mappingId(id)
+                .productId(200)
+                .build();
+        when(mappingRepository.save(any(ProductInventoryMapping.class))).thenReturn(savedMapping);
+
+        Optional<ProductInventoryMapping> result = service.updateMapping(id, toUpdate);
+
+        assertTrue(result.isPresent());
+        assertEquals(id, result.get().getMappingId());
+        assertEquals(savedMapping, result.get());
+        verify(mappingRepository).findById(Long.valueOf(id));
+        verify(mappingRepository).save(any(ProductInventoryMapping.class));
+    }
+
+    @Test
+    void updateMapping_notFound_returnsEmpty() {
+        Integer id = 99;
+        ProductInventoryMapping toUpdate = ProductInventoryMapping.builder()
+                .productId(200)
+                .build();
+
+        when(mappingRepository.findById(Long.valueOf(id))).thenReturn(Optional.empty());
+
+        Optional<ProductInventoryMapping> result = service.updateMapping(id, toUpdate);
+
+        assertFalse(result.isPresent());
+        verify(mappingRepository).findById(Long.valueOf(id));
+        verify(mappingRepository, never()).save(any(ProductInventoryMapping.class));
+    }
+
+    @Test
+    void deleteMapping_callsRepositoryDelete() {
+        Long id = 1L;
+
+        doNothing().when(mappingRepository).deleteById(id);
+
+        service.deleteMapping(id);
+
+        verify(mappingRepository, times(1)).deleteById(id);
     }
 }

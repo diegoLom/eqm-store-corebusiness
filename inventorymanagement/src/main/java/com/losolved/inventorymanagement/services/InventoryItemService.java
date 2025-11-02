@@ -22,7 +22,7 @@ public class InventoryItemService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<InventoryItem> getItemById(Long id) {
+    public Optional<InventoryItem> getItemById(Integer id) {
         return inventoryItemRepository.findById(id);
     }
 
@@ -38,7 +38,7 @@ public class InventoryItemService {
         return inventoryItemRepository.save(item);
     }
 
-    public void deleteItem(Long id) {
+    public void deleteItem(Integer id) {
         inventoryItemRepository.deleteById(id);
     }
 }

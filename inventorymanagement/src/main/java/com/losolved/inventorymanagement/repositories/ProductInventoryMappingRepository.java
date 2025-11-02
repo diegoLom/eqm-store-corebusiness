@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface ProductInventoryMappingRepository extends CrudRepository<ProductInventoryMapping, Long> {
-    List<ProductInventoryMapping> findByProductId(Long productId);
-    Optional<ProductInventoryMapping> findByInventoryItemId(Long inventoryItemId);
+    List<ProductInventoryMapping> findByProductId(Integer productId);
+    Optional<ProductInventoryMapping> findByInventoryItemItemId(Long inventoryItemId);
 }
